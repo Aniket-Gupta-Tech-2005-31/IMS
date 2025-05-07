@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kailash Stationery</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/51b199799f.js" crossorigin="anonymous"></script><!--- for icon ---->
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/category.css">
+</head>
+
+<body>
+    <i class="fa-solid fa-bars" id="btnhide"></i>
+    <div class="sidebar">
+        <div class="top">
+            <div class="logo">
+                <i class="fas fa-file-signature"></i>
+                <span>Dashboard</span>
+            </div>
+            <i class="fa-solid fa-bars" id="btn"></i>
+        </div>
+
+        <div class="user">
+            <img src="/user.jpg" alt="user_img" class="user-img">
+            <div>
+                <p class="bold" id="name">Sandeep Gupta</p>
+                <p id="Syear">Admin</p>
+            </div>
+        </div>
+
+        <ul>
+            <li><a href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="nav-item">Dashboard</span>
+                </a>
+                <span class="tooltip">Dashboard</span>
+            </li>
+
+            <li><a href="/category"><i class="fas fa-edit"></i>
+                    <span class="nav-item">Category</span></a>
+                <span class="tooltip">Category</span>
+            </li>
+
+            <li><a href="/products"><i class="fa-solid fa-lock"></i>
+                    <span class="nav-item">Product</span></a>
+                <span class="tooltip">Product</span>
+            </li>
+
+            <li id="lastlist">
+                <a href="#" id="logout-link"><i class="fas fa-sign-out"></i>
+                    <span class="nav-item">Logout</span>
+                </a>
+                <span class="tooltip">Logiout</span>
+            </li>
+
+        </ul>
+    </div>
+
+    <div class="main-content">
+
+        <header>
+            <h1>Kailash Stationery</h1>
+        </header>
+
+
+        <div class="content">
+            <div class="h2home">
+                <h2>Category</h2>
+            </div>
+            <hr><br>
+
+
+
+
+            <div class="mainContainer">
+                <div class="category-header">
+                    <div class="searchCategory">
+                        <input type="text" id="search" placeholder="Search categories..." oninput="filterCategories()">
+                    </div>
+                    <div class="controls">
+                        <select id="sort-options" onchange="sortCategories()">
+                            <option value="name-asc">Name (A-Z)</option>
+                            <option value="name-desc">Name (Z-A)</option>
+                            <option value="newest">Newest First</option>
+                            <option value="oldest">Oldest First</option>
+                        </select>
+                        <button onclick="setView('grid')">Grid View</button>
+                        <button onclick="setView('list')">List View</button>
+                    </div>
+                    <div class="add-category-btn">
+                        <button onclick="openAddCategorySwal()">+ Add Category</button>
+                    </div>
+                </div>
+
+                <div class="category-container grid" id="category-container">
+                    <!-- Dynamically populated -->
+                </div>
+
+            </div>
+
+
+
+
+
+
+        </div>
+
+    </div>
+
+
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/category.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><!-- SweetAlert2 CDN -->
+
+</body>
+
+</html>

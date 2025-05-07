@@ -1,0 +1,346 @@
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+/* General Styles */
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background-color: #ffffff;
+    color: #333;
+}
+
+/* User Image */
+.user-img {
+    width: 50px;
+    height: auto;
+    border-radius: 50%;
+    border: 1px solid #eee;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+/* Sidebar Styles */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 80px;
+    background-color: #12171e;
+    padding: 0.4rem 0.8rem;
+    transition: all 0.5s ease;
+}
+
+.sidebar.active~.main-content {
+    left: 250px;
+    width: calc(100% - 250px);
+}
+
+.sidebar.active {
+    width: 250px;
+}
+
+.sidebar #btn {
+    position: absolute;
+    color: #fff;
+    top: 0.4rem;
+    left: 50%;
+    font-size: 1.2rem;
+    line-height: 50px;
+    transform: translateX(-50%);
+    cursor: pointer;
+}
+
+.sidebar.active #btn {
+    left: 90%;
+}
+
+.sidebar .top .logo {
+    font-size: 15px;
+    color: #fff;
+    display: flex;
+    height: 50px;
+    align-items: center;
+    pointer-events: none;
+    opacity: 0;
+}
+
+.sidebar.active .top .logo {
+    opacity: 1;
+}
+
+.top .logo i {
+    font-size: 2rem;
+    margin-right: 5px;
+}
+
+/* User Info in Sidebar */
+.user {
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+}
+
+.user p {
+    color: #fff;
+    margin-left: 1rem;
+}
+
+.bold {
+    font-weight: 600;
+}
+
+/* Sidebar Navigation Links */
+.sidebar p {
+    opacity: 0;
+}
+
+.sidebar.active p {
+    opacity: 1;
+}
+
+.sidebar ul li {
+    position: relative;
+    list-style-type: none;
+    height: 50px;
+    margin: 0.8rem auto;
+    line-height: 50px;
+}
+
+.sidebar ul #lastlist {
+    position: absolute;
+    bottom: 0;
+}
+
+.sidebar.active ul #lastlist {
+    width: 90%;
+}
+
+.sidebar ul li a {
+    color: #fff;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 0.8rem;
+}
+
+.sidebar ul li a:hover {
+    background-color: #007bff;
+    color: #ffffff;
+}
+
+.sidebar ul li a i {
+    min-width: 50px;
+    text-align: center;
+    height: 50px;
+    border-radius: 12px;
+    line-height: 50px;
+}
+
+/* Navigation Item Tooltip */
+.sidebar .nav-item {
+    opacity: 0;
+    display: none;
+}
+
+.sidebar.active .nav-item {
+    opacity: 1;
+    display: inline;
+}
+
+/* Tooltip Styling */
+.sidebar ul li .tooltip {
+    background-color: #007bff;
+    color: #eee;
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translate(10px, -50%);
+    box-shadow: 0 0.5rem 0.8rem rgba(0, 0, 0, 0.2);
+    border-radius: 0.6rem;
+    padding: 0.4rem 1.2rem;
+    line-height: 1.8rem;
+    z-index: 2;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0s ease 0.3s;
+}
+
+.sidebar ul li:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar.active ul li .tooltip {
+    visibility: hidden;
+}
+
+/* Main Content Styles */
+.main-content {
+    position: absolute;
+    background-color: #eee;
+    min-height: 100vh;
+    top: 0;
+    left: 80px;
+    transition: all 0.5s ease;
+    width: calc(100% - 80px);
+    flex-grow: 1;
+    z-index: -1;
+}
+
+.h2home {
+    text-align: left;
+    margin-top: 5px;
+    margin-left: 20px;
+}
+
+/* Header Styles */
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    cursor: pointer;
+}
+
+/* Profile Styles */
+.profile {
+    display: flex;
+}
+
+.profile img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.profile h2 {
+    margin-top: 10px;
+    margin-left: 10px;
+}
+
+/* Admin Sidebar Styles */
+#student,
+#faculty,
+#forms i {
+    display: none;
+}
+
+.sidebar.active #student,
+.sidebar.active #faculty,
+.sidebar.active #forms i {
+    display: inline-block;
+}
+
+/* Clickable Elements */
+#clickedfunstudent,
+#clickedfunfaculty,
+#clickedfunforms {
+    cursor: pointer;
+    text-align: right;
+}
+
+/* Active Display for Sections in Sidebar */
+.sidebar.active .student_data.active,
+.sidebar.active .faculty_data.active,
+.sidebar.active .forms_data.active {
+    display: flex;
+}
+
+/* Data Sections Styling */
+.student_data,
+.faculty_data,
+.forms_data {
+    color: #fff;
+    display: none;
+    text-decoration: none;
+    flex-direction: column;
+    padding: 0;
+}
+
+/* Styling for Span Elements in Data Sections */
+.student_data span,
+.faculty_data span,
+.forms_data span {
+    text-align: left;
+    font-size: 15px;
+}
+
+
+
+#hidebarlist {
+    display: none;
+}
+
+#btnhide {
+    display: none;
+}
+
+/* Mobile Responsive */
+@media only screen and (max-width: 705px) {
+
+
+    #btnhide {
+        display: flex;
+        margin: 10px;
+        font-size: 20px;
+        color: #fff;
+    }
+
+    .sidebar {
+        display: none;
+    }
+
+    .sidebar.active {
+        display: block;
+    }
+
+
+    /* Main Content Styles */
+    .main-content {
+        margin: 0;
+        left: 0;
+        width: 100%;
+    }
+
+
+    #hidebarlist {
+        display: block;
+    }
+
+    header {
+        text-align: center;
+        display: flex;
+        justify-content: center !important;
+        align-items: center !important;
+    }
+
+    header h1 {
+        font-size: 5vw !important;
+    }
+
+    header .profile {
+        display: none;
+    }
+
+    .sidebar.active {
+        width: 100vw !important;
+    }
+
+    .sidebar.active~.main-content {
+        width: 100vw !important;
+        position: fixed;
+        bottom: 0 !important;
+    }
+}

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kailash Stationery</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet" />
+    <script src="https://kit.fontawesome.com/51b199799f.js" crossorigin="anonymous"></script><!--- for icon ---->
+    <link rel="stylesheet" href="/css/sidebar.css">
+    <link rel="stylesheet" href="/css/products.css">
+</head>
+
+<body>
+    <i class="fa-solid fa-bars" id="btnhide"></i>
+    <div class="sidebar">
+        <div class="top">
+            <div class="logo">
+                <i class="fas fa-file-signature"></i>
+                <span>Dashboard</span>
+            </div>
+            <i class="fa-solid fa-bars" id="btn"></i>
+        </div>
+
+        <div class="user">
+            <img src="/user.jpg" alt="user_img" class="user-img">
+            <div>
+                <p class="bold" id="name">Sandeep Gupta</p>
+                <p id="Syear">Admin</p>
+            </div>
+        </div>
+
+        <ul>
+            <li><a href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span class="nav-item">Dashboard</span>
+                </a>
+                <span class="tooltip">Dashboard</span>
+            </li>
+
+            <li><a href="/category"><i class="fas fa-edit"></i>
+                    <span class="nav-item">Category</span></a>
+                <span class="tooltip">Category</span>
+            </li>
+
+            <li><a href="/products"><i class="fa-solid fa-lock"></i>
+                    <span class="nav-item">Product</span></a>
+                <span class="tooltip">Product</span>
+            </li>
+
+            <li id="lastlist">
+                <a href="#" id="logout-link"><i class="fas fa-sign-out"></i>
+                    <span class="nav-item">Logout</span>
+                </a>
+                <span class="tooltip">Logiout</span>
+            </li>
+
+        </ul>
+    </div>
+
+    <div class="main-content">
+
+        <header>
+            <h1>Kailash Stationery</h1>
+        </header>
+
+
+        <div class="content">
+            <div class="h2home">
+                <h2>Products</h2>
+            </div>
+            <hr><br>
+
+
+
+
+            <div class="mainContainer">
+                <div class="category-header">
+                    <div class="searchCategory">
+                        <input type="text" id="search-input" placeholder="Search products..." />
+                    </div>
+                    <div class="category-filter">
+                        <label for="category-filter">Filter by Category:</label>
+                        <select id="category-filter">
+                            <option value="">All</option>
+                            ${categories.map(cat => `<option value="${cat}">${cat}</option>`).join("")}
+                        </select>
+                    </div>
+                    <div class="date-filter">
+                        <label for="date-filter">Filter by Date:</label>
+                        <input type="date" id="date-filter" />
+                    </div>
+
+                    <div class="add-category-btn">
+                        <button id="open-modal-btn">Add Product</button>
+                    </div>
+                </div>
+
+                <!-- Add Product Popup Modal -->
+                <div id="add-product-modal" class="modal">
+                    <div class="modal-content">
+                        <span class="close-btn" id="close-modal-btn">&times;</span>
+                        <h2>Add New Product</h2>
+                        <form id="add-category-form">
+
+                            <div class="form-group">
+                                <label for="product-image">Product Image</label>
+                                <input type="file" id="product-image" name="image" class="form-input">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="product-name">Product Name</label>
+                                <input type="text" id="product-name" class="form-input" placeholder="Enter Product Name"
+                                    required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="purchase-price">Purchase Price</label>
+                                <input type="number" id="purchase-price" class="form-input"
+                                    placeholder="Enter Purchase Price" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="selling-price">Selling Price</label>
+                                <input type="number" id="selling-price" class="form-input"
+                                    placeholder="Enter Selling Price" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="category">Select Categories</label>
+                                <div class="custom-multiselect">
+                                    <div class="select-box" id="select-box">Select Categories ▼</div>
+                                    <div class="checkbox-options" id="category-checkboxes">
+                                        <!-- checkboxes will be loaded here -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="submit-btn">Add Product</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Product List Section -->
+                <div class="tablecontent">
+                    <table class="product-table" id="product-table">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Products Name</th>
+                                <th>Category</th>
+                                <th>Purchase Price</th>
+                                <th>Selling Price</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-container">
+                            <!-- JS will insert rows here -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/products.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><!-- SweetAlert2 CDN -->
+
+</body>
+
+</html>
