@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const Category = require('../models/categorySchema');
+const productsSchema = require('../modelS/productSchema');
 
 // Memory storage to get image as buffer
 const storage = multer.memoryStorage();
@@ -26,7 +27,7 @@ router.get('/get-categories', async (req, res) => {
 // add category
 router.post('/add-category', upload.single('image'), async (req, res) => {
     try {
-        const { name, description, tags } = req.body;
+        const { name, description, tags, sellers } = req.body;
         const image = req.file;
 
         if (!name) {
@@ -36,7 +37,8 @@ router.post('/add-category', upload.single('image'), async (req, res) => {
         const newCategoryData = {
             name,
             description,
-            tags: tags ? tags.split(',').map(tag => tag.trim()) : []
+            tags: tags ? tags.split(',').map(tag => tag.trim()) : [],
+            sellers: JSON.parse(sellers) // Parse JSON sellers list
         };
 
         if (image) {
@@ -58,27 +60,16 @@ router.post('/add-category', upload.single('image'), async (req, res) => {
 });
 
 // edit category
-router.put('/update-category/:id', upload.single('image'), async (req, res) => {
+router.put('/update-category/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const { name, description, tags } = req.body;
+        const { name, description, tags, sellers } = req.body;
 
         if (!name || !description) {
             return res.status(400).json({ success: false, message: 'Name and description are required.' });
         }
 
-        const updateFields = {
-            name,
-            description,
-            tags: tags ? tags.split(',').map(tag => tag.trim()) : []
-        };
-
-        if (req.file) {
-            updateFields.image = {
-                data: req.file.buffer,
-                contentType: req.file.mimetype
-            };
-        }
+        const updateFields = { name, description, tags: tags ? tags.split(',').map(tag => tag.trim()) : [], sellers };
 
         const updated = await Category.findByIdAndUpdate(id, updateFields, { new: true });
 
@@ -109,6 +100,47 @@ router.delete('/delete-category/:id', async (req, res) => {
         res.status(500).json({ success: false, message: 'Server error.' });
     }
 });
+
+// Get products by category name with pagination
+router.get('/products-by-category/:categoryName', async (req, res) => {
+    const { categoryName } = req.params;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.max(1, parseInt(req.query.limit) || 10);
+
+    try {
+        const totalProducts = await productsSchema.countDocuments({ categories: categoryName });
+
+        if (totalProducts === 0) {
+            return res.json({ success: true, data: [], total: 0, message: 'No products found for this category.' });
+        }
+
+        const products = await productsSchema.find({ categories: categoryName })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        res.json({ success: true, data: products, total: totalProducts });
+    } catch (error) {
+        console.error('Error fetching products by category:', error);
+        res.status(500).json({ success: false, message: 'Internal server error.' });
+    }
+});
+
+router.get('/details/:categoryName', async (req, res) => {
+    try {
+        const categoryName = req.params.categoryName;
+        const category = await Category.findOne({ name: categoryName });
+
+        if (!category) {
+            return res.json({ success: false, message: 'Category not found' });
+        }
+
+        res.json({ success: true, data: category });
+    } catch (err) {
+        console.error('Error fetching category details:', err);
+        res.status(500).json({ success: false, message: 'Failed to fetch category details' });
+    }
+});
+
 
 
 module.exports = router;

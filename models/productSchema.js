@@ -1,4 +1,4 @@
-// models/Product.js
+
 const mongoose = require('mongoose');
 
 const productSchema = new mongoose.Schema({
@@ -23,7 +23,9 @@ const productSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
-}, { timestamps: true }
-);
+}, { timestamps: true });
 
-module.exports = mongoose.model('Product', productSchema);
+// Use the existing model if it is already defined, otherwise create a new one
+const Product = mongoose.models.Product || mongoose.model('Product', productSchema);
+
+module.exports = Product;

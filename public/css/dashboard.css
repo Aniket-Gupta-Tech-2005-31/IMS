@@ -60,6 +60,13 @@
     border-left: 5px solid #007bff;
 }
 
+.card i{
+   font-size: 40px;
+}
+.card a{
+    text-decoration: none;
+}
+
 .card:hover {
     transform: translateY(-8px);
     box-shadow: 0 12px 24px rgba(0, 123, 255, 0.2);
