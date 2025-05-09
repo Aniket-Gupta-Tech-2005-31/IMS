@@ -41,6 +41,12 @@ async function fetchData() {
     }
 }
 
+// Format date to DD/MM/YYYY
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}/${date.getFullYear()}`;
+}
+
 // Populate category dropdown
 function populateCategoryFilter() {
     categoryFilter.innerHTML = ''; // ✅ Clear existing options
@@ -105,7 +111,7 @@ function renderTopProducts() {
             <td>${p.name}</td>
             <td>${p.categories.join(', ')}</td>
             <td>₹${p.sellingPrice}</td>
-            <td>${new Date(p.createdAt).toLocaleDateString()}</td>
+            <td>${formatDate(p.createdAt)}</td>
         `;
         productsListEl.appendChild(row);
     });
@@ -130,8 +136,9 @@ function renderFilteredProducts(filteredProducts) {
             row.innerHTML = `
                 <td>${p.name}</td>
                 <td>${p.categories.join(', ')}</td>
+                <td>₹${p.purchasePrice}</td>
                 <td>₹${p.sellingPrice}</td>
-                <td>${new Date(p.createdAt).toLocaleDateString()}</td>
+               <td>${formatDate(p.createdAt)}</td>
             `;
             filteredResultsEl.appendChild(row);
         });

@@ -130,6 +130,8 @@ router.get('/details/:categoryName', async (req, res) => {
         const categoryName = req.params.categoryName;
         const category = await Category.findOne({ name: categoryName });
 
+        console.log('Fetched Category:', category); // Debugging line
+
         if (!category) {
             return res.json({ success: false, message: 'Category not found' });
         }

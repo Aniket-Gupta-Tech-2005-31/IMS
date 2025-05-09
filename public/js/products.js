@@ -29,10 +29,13 @@ openModalBtn.onclick = () => {
     modal.style.display = "flex";
     resetForm();
 };
+
+// Close modal on button click or outside click
 closeModalBtn.onclick = () => {
     modal.style.display = "none";
     resetForm();
 };
+// Close modal on outside click
 window.onclick = (e) => {
     if (e.target === modal) {
         modal.style.display = "none";

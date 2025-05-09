@@ -1,5 +1,4 @@
 
-
 // Call fetchAndDisplayCategories when DOM is ready
 document.addEventListener('DOMContentLoaded', function () {
     fetchAndDisplayCategories();
@@ -54,6 +53,8 @@ async function fetchAndDisplayCategories() {
         console.error('Error fetching categories:', err);
     }
 }
+
+
 
 // Function to open SweetAlert for adding a new category
 function openAddCategorySwal() {
@@ -134,16 +135,21 @@ function openAddCategorySwal() {
 // Add new seller input fields
 function addSeller() {
     const container = document.getElementById('seller-container');
-    const sellerIndex = container.querySelectorAll('.seller-entry').length + 1;
     const newSeller = document.createElement('div');
     newSeller.className = 'seller-entry';
     newSeller.innerHTML = `
-        <label>Seller ${sellerIndex}</label>
+        <label>Seller</label>
+        <button type="button" onclick="removeSeller(this)">❌</button>
         <input type="text" placeholder="Seller Name" class="swal2-input seller-name">
         <input type="text" placeholder="Contact Number" class="swal2-input seller-contact">
         <input type="text" placeholder="Location" class="swal2-input seller-location">
     `;
     container.appendChild(newSeller);
+}
+
+// Function to remove a seller in the edit modal
+function removeSeller(btn) {
+    btn.closest('.seller-entry').remove();
 }
 
 // Function to edit a category 
@@ -165,7 +171,8 @@ function editCategory(btn) {
             <input type="text" id="swal-category-tags" class="swal2-input" value="${currentTags}" placeholder="Tags (comma separated)">
             <div id="seller-container">${sellers.map((seller, index) => `
                 <div class="seller-entry">
-                    <label>Seller ${index + 1}</label>
+                <label>Seller ${index + 1}</label>
+                <button type="button" onclick="removeSeller(this)">❌</button>
                     <input type="text" value="${seller.name}" placeholder="Seller Name" class="swal2-input seller-name">
                     <input type="text" value="${seller.contactNumber}" placeholder="Contact Number" class="swal2-input seller-contact">
                     <input type="text" value="${seller.location}" placeholder="Location" class="swal2-input seller-location">
@@ -175,9 +182,26 @@ function editCategory(btn) {
         `,
         confirmButtonText: 'Save Changes',
         showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        focusConfirm: false
+        focusConfirm: false,
+        preConfirm: () => {
+            const name = document.getElementById('swal-category-name').value.trim();
+            const description = document.getElementById('swal-category-description').value.trim();
+            const tags = document.getElementById('swal-category-tags').value.trim();
+            const sellerElements = document.querySelectorAll('.seller-entry');
+
+            const updatedSellers = Array.from(sellerElements).map(el => ({
+                name: el.querySelector('.seller-name').value.trim(),
+                contactNumber: el.querySelector('.seller-contact').value.trim(),
+                location: el.querySelector('.seller-location').value.trim()
+            })).filter(s => s.name && s.contactNumber && s.location);
+
+            return { name, description, tags, sellers: updatedSellers };
+        }
+    }).then(result => {
+        if (result.isConfirmed) {
+            const { name, description, tags, sellers } = result.value;
+            updateCategory(categoryId, name, description, tags, sellers);
+        }
     });
 }
 
@@ -236,44 +260,9 @@ function removeCategory(btn) {
     });
 }
 
-// Filter categories by name or tags
-function filterCategories() {
-    const query = document.getElementById('search').value.toLowerCase();
-    document.querySelectorAll('.category-item').forEach(item => {
-        const name = item.querySelector('.category-name').innerText.toLowerCase();
-        const tags = Array.from(item.querySelectorAll('.tag')).map(t => t.innerText.toLowerCase());
-        item.style.display = (name.includes(query) || tags.some(tag => tag.includes(query))) ? '' : 'none';
-    });
-}
-
-// Sort categories by name or timestamp
-function sortCategories() {
-    const container = document.getElementById('category-container');
-    const option = document.getElementById('sort-options').value;
-    const items = Array.from(container.children);
-    items.sort((a, b) => {
-        if (option === 'name-asc' || option === 'name-desc') {
-            const nameA = a.querySelector('.category-name').innerText.toLowerCase();
-            const nameB = b.querySelector('.category-name').innerText.toLowerCase();
-            return option === 'name-asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
-        } else {
-            const timeA = parseInt(a.dataset.timestamp);
-            const timeB = parseInt(b.dataset.timestamp);
-            return option === 'newest' ? timeB - timeA : timeA - timeB;
-        }
-    });
-    items.forEach(item => container.appendChild(item));
-}
-
-// Toggle grid/list view
-function setView(view) {
-    const container = document.getElementById('category-container');
-    container.classList.toggle('grid', view === 'grid');
-    container.classList.toggle('list', view === 'list');
-}
 
 
-
+// Function to view category details
 async function viewCategoryDetails(categoryName) {
     try {
         const res = await fetch(`/category/details/${encodeURIComponent(categoryName)}`);
@@ -293,16 +282,17 @@ async function viewCategoryDetails(categoryName) {
 function showCategoryDetailsPopup(category) {
     const popup = document.getElementById('centerpopup');
     const popupContent = document.getElementById('popup-content');
-    
+
     popupContent.innerHTML = `
     <div class="showCategoryDetailsPopup">
         <h3>Category Details: ${category.name}</h3>
         <p><strong>Description:</strong> ${category.description || 'No description available.'}</p>
         <p><strong>Tags:</strong> ${category.tags?.join(', ') || 'No tags available.'}</p>
         <p><strong>Sellers:</strong></p>
-        <ul>
+        <ul id="seller-list">
             ${category.sellers.length > 0 ? category.sellers.map((seller, index) => `
-                <li><strong>Seller ${index + 1}:</strong><br>
+                <li>
+                    <strong>Seller ${index + 1}:</strong><br>
                     Name: ${seller.name} <br>
                     Contact: ${seller.contactNumber} <br>
                     Location: ${seller.location}
@@ -310,9 +300,8 @@ function showCategoryDetailsPopup(category) {
             `).join('') : '<li>No sellers available for this category.</li>'}
         </ul>
         <button onclick="closePopup()">Close</button>
-        </div>
+    </div>
     `;
-    
     popup.style.display = 'block';
 }
 
@@ -321,6 +310,9 @@ function closePopup() {
     const popup = document.getElementById('centerpopup');
     popup.style.display = 'none';
 }
+
+
+
 
 
 // show product by category bu clicking button 
@@ -384,3 +376,40 @@ function showCustomPopup(title, message) {
     popup.style.display = 'block';
 }
 
+
+// Toggle grid/list view
+function setView(view) {
+    const container = document.getElementById('category-container');
+    container.classList.toggle('grid', view === 'grid');
+    container.classList.toggle('list', view === 'list');
+}
+
+// filter
+// Filter categories by name or tags
+function filterCategories() {
+    const query = document.getElementById('search').value.toLowerCase();
+    document.querySelectorAll('.category-item').forEach(item => {
+        const name = item.querySelector('.category-name').innerText.toLowerCase();
+        const tags = Array.from(item.querySelectorAll('.tag')).map(t => t.innerText.toLowerCase());
+        item.style.display = (name.includes(query) || tags.some(tag => tag.includes(query))) ? '' : 'none';
+    });
+}
+
+// Sort categories by name or timestamp
+function sortCategories() {
+    const container = document.getElementById('category-container');
+    const option = document.getElementById('sort-options').value;
+    const items = Array.from(container.children);
+    items.sort((a, b) => {
+        if (option === 'name-asc' || option === 'name-desc') {
+            const nameA = a.querySelector('.category-name').innerText.toLowerCase();
+            const nameB = b.querySelector('.category-name').innerText.toLowerCase();
+            return option === 'name-asc' ? nameA.localeCompare(nameB) : nameB.localeCompare(nameA);
+        } else {
+            const timeA = parseInt(a.dataset.timestamp);
+            const timeB = parseInt(b.dataset.timestamp);
+            return option === 'newest' ? timeB - timeA : timeA - timeB;
+        }
+    });
+    items.forEach(item => container.appendChild(item));
+}
