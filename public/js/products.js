@@ -108,7 +108,7 @@ function renderProducts(productList) {
     productList.forEach(product => {
         const imageTag = product.image?.data
             ? `<img src="data:${product.image.contentType};base64,${product.image.data}" width="60" height="60" />`
-            : 'No image';
+            : `<img src="/image/dummy_category.png" width="60" height="60" />`;
 
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -146,6 +146,8 @@ addCategoryForm.addEventListener('submit', async (e) => {
     formData.append('categories', JSON.stringify(selectedCategories));
     if (imageInput.files[0]) {
         formData.append('image', imageInput.files[0]);
+    } else {
+        formData.append('image', '/image/dummy_category.png');
     }
 
     try {
@@ -182,7 +184,15 @@ function resetForm() {
 
 // Delete Product
 async function deleteProduct(id) {
-    const confirmed = confirm("Are you sure you want to delete this product?");
+  const confirmed = await Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!"
+      });
     if (!confirmed) return;
 
     try {

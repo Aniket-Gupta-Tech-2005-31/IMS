@@ -1,7 +1,6 @@
 /* Main Container */
 .mainContainer {
-    max-width: 1200px;
-    margin: 0 auto;
+    margin: 0 20px;
     background-color: #fff;
     padding: 10px;
     border-radius: 12px;
@@ -171,7 +170,7 @@
 
 .editAndDelete {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
 
 }

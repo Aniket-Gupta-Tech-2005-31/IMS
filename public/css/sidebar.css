@@ -213,6 +213,11 @@ header {
 header h1 {
     cursor: pointer;
 }
+header a {
+    cursor: pointer;
+    text-decoration: none;
+    color: #fff;
+}
 
 /* Profile Styles */
 .profile {

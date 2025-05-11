@@ -49,7 +49,7 @@ function formatDate(dateStr) {
 
 // Populate category dropdown
 function populateCategoryFilter() {
-    categoryFilter.innerHTML = ''; // ✅ Clear existing options
+    categoryFilter.innerHTML = ''; 
 
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
@@ -100,11 +100,11 @@ applyFiltersBtn.addEventListener('click', () => {
     renderFilteredProducts(filtered);
 });
 
-// Render the first 5 products
+// Render the first 10 products
 function renderTopProducts() {
-    productsListEl.innerHTML = ''; // ✅ Clear previous content
+    productsListEl.innerHTML = ''; 
 
-    const top5Products = products.slice(0, 5);
+    const top5Products = products.slice(0, 10);
     top5Products.forEach(p => {
         const row = document.createElement('tr');
         row.innerHTML = `
@@ -151,3 +151,6 @@ function renderFilteredProducts(filteredProducts) {
 closePopupBtn.addEventListener('click', () => {
     popupOverlay.classList.add('hidden');
 });
+
+
+

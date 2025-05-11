@@ -22,7 +22,7 @@ async function fetchAndDisplayCategories() {
 
                 const imgSrc = (cat.image && cat.image.data)
                     ? `data:${cat.image.contentType};base64,${cat.image.data}`
-                    : '/img/logo.png';
+                    : '/image/dummy_category.png';
 
                 item.innerHTML = `
                 <img src="${imgSrc}" alt="${cat.name}">
@@ -61,7 +61,7 @@ function openAddCategorySwal() {
     Swal.fire({
         title: 'Add New Category',
         html: `
-        <input type="text" id="swal-category-name" class="swal2-input" placeholder="Category Name">
+        <input type="text" id="swal-category-name" class="swal2-input" placeholder="Category Name" required>
         <textarea id="swal-category-description" class="swal2-textarea" placeholder="Category Description"></textarea>
         <input type="text" id="swal-category-tags" class="swal2-input" placeholder="Tags (comma separated)">
         <input type="file" id="swal-category-image" class="swal2-file" accept="image/*">
@@ -93,8 +93,8 @@ function openAddCategorySwal() {
                 location: el.querySelector('.seller-location').value.trim()
             })).filter(s => s.name && s.contactNumber && s.location);
 
-            if (!name || !description || sellers.length === 0) {
-                Swal.showValidationMessage('Please fill in all details including at least one seller.');
+            if (!name) {
+                Swal.showValidationMessage('Please fill Categoty Name.');
                 return false;
             }
 
@@ -152,27 +152,30 @@ function removeSeller(btn) {
     btn.closest('.seller-entry').remove();
 }
 
-// Function to edit a category 
-function editCategory(btn) {
+// Updating Category 
+async function editCategory(btn) {
     const item = btn.closest('.category-item');
     const categoryId = item.dataset.id;
     const nameEl = item.querySelector('.category-name');
     const descEl = item.querySelector('.category-description');
     const tagsEl = item.querySelector('.category-tags');
     const currentTags = Array.from(tagsEl.querySelectorAll('.tag')).map(t => t.innerText).join(', ');
+    const imageEl = item.querySelector('img.category-image');
 
     const sellers = JSON.parse(item.dataset.sellers || '[]');
 
     Swal.fire({
         title: 'Edit Category',
         html: `
+            <img id="swal-image-preview" src="${imageEl ? imageEl.src : ''}" style="max-width: 100px; margin-top: 10px;"/>
             <input type="text" id="swal-category-name" class="swal2-input" value="${nameEl.innerText}">
             <textarea id="swal-category-description" class="swal2-textarea">${descEl.innerText}</textarea>
             <input type="text" id="swal-category-tags" class="swal2-input" value="${currentTags}" placeholder="Tags (comma separated)">
+            <input type="file" id="swal-category-image" class="swal2-file" accept="image/*" onchange="previewImage(this)">
             <div id="seller-container">${sellers.map((seller, index) => `
                 <div class="seller-entry">
-                <label>Seller ${index + 1}</label>
-                <button type="button" onclick="removeSeller(this)">❌</button>
+                    <label>Seller ${index + 1}</label>
+                    <button type="button" onclick="removeSeller(this)">❌</button>
                     <input type="text" value="${seller.name}" placeholder="Seller Name" class="swal2-input seller-name">
                     <input type="text" value="${seller.contactNumber}" placeholder="Contact Number" class="swal2-input seller-contact">
                     <input type="text" value="${seller.location}" placeholder="Location" class="swal2-input seller-location">
@@ -182,48 +185,66 @@ function editCategory(btn) {
         `,
         confirmButtonText: 'Save Changes',
         showCancelButton: true,
-        focusConfirm: false,
         preConfirm: () => {
             const name = document.getElementById('swal-category-name').value.trim();
             const description = document.getElementById('swal-category-description').value.trim();
-            const tags = document.getElementById('swal-category-tags').value.trim();
-            const sellerElements = document.querySelectorAll('.seller-entry');
+            const tags = document.getElementById('swal-category-tags').value.trim().split(',').map(tag => tag.trim());
+            const image = document.getElementById('swal-category-image').files[0];
 
+            const sellerElements = document.querySelectorAll('.seller-entry');
             const updatedSellers = Array.from(sellerElements).map(el => ({
                 name: el.querySelector('.seller-name').value.trim(),
                 contactNumber: el.querySelector('.seller-contact').value.trim(),
                 location: el.querySelector('.seller-location').value.trim()
             })).filter(s => s.name && s.contactNumber && s.location);
 
-            return { name, description, tags, sellers: updatedSellers };
+            return { name, description, tags, image, sellers: updatedSellers };
         }
     }).then(result => {
         if (result.isConfirmed) {
-            const { name, description, tags, sellers } = result.value;
-            updateCategory(categoryId, name, description, tags, sellers);
+            const { name, description, tags, image, sellers } = result.value;
+            updateCategory(categoryId, name, description, tags, image, sellers);
         }
     });
 }
 
-// Function to update category (including sellers)
-async function updateCategory(categoryId, name, description, tags, sellers) {
+// Function to update category
+async function updateCategory(categoryId, name, description, tags, image, sellers) {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('tags', JSON.stringify(tags));
+    if (image) formData.append('image', image);
+    formData.append('sellers', JSON.stringify(sellers));
+
     try {
         const response = await fetch(`/category/update-category/${categoryId}`, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, description, tags, sellers })
+            body: formData
         });
 
         const data = await response.json();
         if (data.success) {
             Swal.fire('Updated!', 'Category updated successfully.', 'success');
-            fetchAndDisplayCategories();
+            fetchAndDisplayCategories(); // Reload categories without page reload
         } else {
             Swal.fire('Error', data.message || 'Failed to update category.', 'error');
         }
     } catch (err) {
         console.error('Update Error:', err);
         Swal.fire('Error', 'Something went wrong.', 'error');
+    }
+}
+
+// Image Preview Function
+function previewImage(input) {
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            document.getElementById('swal-image-preview').src = e.target.result;
+        }
+        reader.readAsDataURL(file);
     }
 }
 
@@ -280,12 +301,16 @@ async function viewCategoryDetails(categoryName) {
 }
 
 function showCategoryDetailsPopup(category) {
-    const popup = document.getElementById('centerpopup');
-    const popupContent = document.getElementById('popup-content');
+    const popup = document.querySelector('.centerpopup');
+    const popupContent = document.querySelector('.popup-content');
+
+    // Set default image if not available
+    const imageSrc = category.image?.data ? `data:${category.image.contentType};base64,${category.image.data}` : '/image/dummy_category.png';
 
     popupContent.innerHTML = `
     <div class="showCategoryDetailsPopup">
         <h3>Category Details: ${category.name}</h3>
+        <img src="${imageSrc}" alt="${category.name}" class="category-image" style="width: 200px; height: 200px; object-fit: cover;">
         <p><strong>Description:</strong> ${category.description || 'No description available.'}</p>
         <p><strong>Tags:</strong> ${category.tags?.join(', ') || 'No tags available.'}</p>
         <p><strong>Sellers:</strong></p>
@@ -302,12 +327,13 @@ function showCategoryDetailsPopup(category) {
         <button onclick="closePopup()">Close</button>
     </div>
     `;
-    popup.style.display = 'block';
+
+    popup.style.display = 'flex';
 }
 
 
 function closePopup() {
-    const popup = document.getElementById('centerpopup');
+    const popup = document.querySelector('.centerpopup');
     popup.style.display = 'none';
 }
 
@@ -335,8 +361,8 @@ async function openProductsPopup(categoryName, page = 1) {
 }
 
 function showProductsPopup(products, categoryName, page, totalProducts) {
-    const popup = document.getElementById('centerpopup');
-    const popupContent = document.getElementById('popup-content');
+    const popup = document.querySelector('.centerpopup');
+    const popupContent = document.querySelector('.popup-content');
     const totalPages = Math.ceil(totalProducts / productsPerPage);
 
     popupContent.innerHTML = `
@@ -366,12 +392,12 @@ function changePage(categoryName, page) {
 }
 
 function closeCustomPopup() {
-    document.getElementById('centerpopup').style.display = 'none';
+    document.querySelector('.centerpopup').style.display = 'none';
 }
 
 function showCustomPopup(title, message) {
     const popup = document.getElementById('custom-popup');
-    const popupContent = document.getElementById('popup-content');
+    const popupContent = document.querySelector('.popup-content');
     popupContent.innerHTML = `<h2>${title}</h2><p>${message}</p><button class="close-popup" onclick="closeCustomPopup()">Close</button>`;
     popup.style.display = 'block';
 }

@@ -60,16 +60,29 @@ router.post('/add-category', upload.single('image'), async (req, res) => {
 });
 
 // edit category
-router.put('/update-category/:id', async (req, res) => {
+router.put('/update-category/:id', upload.single('image'), async (req, res) => {
     try {
         const { id } = req.params;
         const { name, description, tags, sellers } = req.body;
 
-        if (!name || !description) {
-            return res.status(400).json({ success: false, message: 'Name and description are required.' });
+        if (!name) {
+            return res.status(400).json({ success: false, message: 'Name is required.' });
         }
 
-        const updateFields = { name, description, tags: tags ? tags.split(',').map(tag => tag.trim()) : [], sellers };
+        const updateFields = {
+            name,
+            description,
+            tags: JSON.parse(tags),
+            sellers: JSON.parse(sellers)
+        };
+
+        // Handle image update
+        if (req.file) {
+            updateFields.image = {
+                data: req.file.buffer.toString('base64'),
+                contentType: req.file.mimetype
+            };
+        }
 
         const updated = await Category.findByIdAndUpdate(id, updateFields, { new: true });
 
@@ -129,8 +142,6 @@ router.get('/details/:categoryName', async (req, res) => {
     try {
         const categoryName = req.params.categoryName;
         const category = await Category.findOne({ name: categoryName });
-
-        console.log('Fetched Category:', category); // Debugging line
 
         if (!category) {
             return res.json({ success: false, message: 'Category not found' });

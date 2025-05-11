@@ -7,30 +7,39 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     password: formData.get('password')
   };
 
-  const response = await fetch('/login', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  });
-
-  const result = await response.json();
-
-  if (result.success) {
-    // Login success
-    Swal.fire({
-      icon: 'success',
-      title: 'Login Successful',
-      showConfirmButton: false,
-      timer: 1500
-    }).then(() => {
-      window.location.href = '/dashboard'; // 🔁 Redirect to dashboard
+  try {
+    const response = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data)
     });
-  } else {
-    // Login failed
+
+    const result = await response.json();
+
+    if (response.ok && result.success) {
+      // Login successful
+      Swal.fire({
+        icon: 'success',
+        title: 'Login Successful',
+        showConfirmButton: false,
+        timer: 1500
+      }).then(() => {
+        window.location.href = '/dashboard';
+      });
+    } else {
+      // Login failed (show error message)
+      Swal.fire({
+        icon: 'error',
+        title: 'Login Failed',
+        text: result.message
+      });
+    }
+  } catch (error) {
+    // Server error
     Swal.fire({
       icon: 'error',
-      title: 'Login Failed',
-      text: result.message
+      title: 'Error',
+      text: 'Something went wrong. Please try again.'
     });
   }
 });
