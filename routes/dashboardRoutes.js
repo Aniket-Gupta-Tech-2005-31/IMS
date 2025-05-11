@@ -28,34 +28,4 @@ router.get('/getProducts', async (req, res) => {
     }
 });
 
-// Optional: Individual API filters (not used in current frontend)
-router.get('/filterByCategory', async (req, res) => {
-    const { category } = req.query;
-    try {
-        const products = await Product.find({ categories: { $in: [category] } });
-        res.json(products);
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to filter by category' });
-    }
-});
-
-router.get('/filterByDate', async (req, res) => {
-    const { date } = req.query;
-    try {
-        const start = new Date(date);
-        const end = new Date(start);
-        end.setDate(end.getDate() + 1);
-
-        const products = await Product.find({
-            createdAt: {
-                $gte: start,
-                $lt: end
-            }
-        });
-        res.json(products);
-    } catch (err) {
-        res.status(500).json({ error: 'Failed to filter by date' });
-    }
-});
-
 module.exports = router;
