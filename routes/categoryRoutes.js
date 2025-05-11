@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const Category = require('../models/categorySchema');
-const productsSchema = require('../modelS/productSchema');
+const productsSchema = require('../models   /productSchema');
 
 // Memory storage to get image as buffer
 const storage = multer.memoryStorage();
